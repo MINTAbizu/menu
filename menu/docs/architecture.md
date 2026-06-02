@@ -1,9 +1,9 @@
 # Smart Hospitality Operating System Architecture
 
-This repo currently contains a Vite React prototype. The target production shape is a split SaaS platform:
+This repo currently contains a Vite React prototype and a separate Node.js backend folder. The target production shape is a split SaaS platform:
 
-- `apps/web`: Next.js App Router frontend for guest, hotel, staff, and super admin experiences.
-- `apps/api`: Express.js API with Prisma, PostgreSQL, JWT auth, RBAC, Socket.io, and rate limiting.
+- `menu`: current frontend prototype, later upgradeable to Next.js App Router.
+- `backend`: Express.js API with Mongoose, MongoDB, JWT auth, RBAC, Socket.io, and rate limiting.
 - `packages/ui`: shared Tailwind component system.
 - `packages/config`: shared TypeScript, ESLint, environment, and tenant config.
 
@@ -66,12 +66,10 @@ Use controller/service/repository boundaries:
 ## Environment Variables
 
 ```bash
-DATABASE_URL=
+MONGODB_URI=
 JWT_ACCESS_SECRET=
 JWT_REFRESH_SECRET=
 FRONTEND_ORIGIN=
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
 CHAPA_SECRET_KEY=
 TELEBIRR_MERCHANT_ID=
 CBE_BIRR_MERCHANT_ID=
@@ -85,6 +83,6 @@ OPENAI_API_KEY=
 
 - Frontend: Vercel.
 - Backend: Render web service.
-- Database: Supabase PostgreSQL.
+- Database: MongoDB Atlas or self-hosted MongoDB.
 - Realtime: Socket.io on the API service with Redis adapter when horizontally scaled.
-- CI/CD: run lint, typecheck, unit tests, Prisma migration checks, and production build on every pull request.
+- CI/CD: run lint, typecheck, unit tests, model/index checks, and production build on every pull request.
