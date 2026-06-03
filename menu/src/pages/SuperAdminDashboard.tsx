@@ -7,6 +7,10 @@ const metrics = [
   { label: 'Active subscriptions', value: '124' },
   { label: 'Platform MRR', value: '$278K' },
   { label: 'Total customers', value: '23,400' },
+  { label: 'Total orders', value: '418K' },
+  { label: 'Hotel growth', value: '+18%' },
+  { label: 'Platform activity', value: '99.98%' },
+  { label: 'AI alerts', value: '7' },
 ]
 
 const approvalItems = [
@@ -94,6 +98,10 @@ export function SuperAdminDashboard({ tenant }: { tenant: Tenant }) {
             monitor subscriptions, and broadcast system notifications.
           </p>
         </div>
+        <div className="header-actions">
+          <button type="button">Broadcast</button>
+          <button type="button" className="primary-button">Create plan</button>
+        </div>
       </div>
 
       <div className="metric-grid wide-grid">
@@ -107,6 +115,22 @@ export function SuperAdminDashboard({ tenant }: { tenant: Tenant }) {
       </div>
 
       <AssignOwnerPanel tenant={tenant} />
+
+      <section className="section-card feature-grid">
+        {[
+          ['Revenue analytics', 'MRR, payment success, expansion, churn risk, and subscription health.'],
+          ['Onboarding management', 'Approve hotels, verify documents, assign owners, and launch tenants.'],
+          ['Subscription plans', 'Control pricing tiers, quotas, AI features, QR limits, and billing status.'],
+          ['User management', 'Audit roles, permissions, hotel assignments, and account access.'],
+          ['Notification broadcast', 'Send platform-wide or tenant-scoped announcements.'],
+          ['AI insights dashboard', 'Detect unusual order drops, guest sentiment risk, and plan upgrade leads.'],
+        ].map(([title, description]) => (
+          <article key={title} className="feature-tile">
+            <strong>{title}</strong>
+            <span>{description}</span>
+          </article>
+        ))}
+      </section>
 
       <section className="section-card">
         <div className="section-heading">
@@ -146,7 +170,7 @@ export function SuperAdminDashboard({ tenant }: { tenant: Tenant }) {
             </div>
           ))}
         </div>
-        <div className="section-card compact-card">
+        <div>
           <div className="section-heading">
             <span className="eyebrow">Tenant insight</span>
             <h2>Selected tenant</h2>

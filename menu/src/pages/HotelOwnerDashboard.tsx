@@ -7,6 +7,10 @@ const ownerMetrics = [
   { label: 'Active tables', value: '48' },
   { label: 'Monthly revenue', value: '$45K' },
   { label: 'Guest CSAT', value: '94%' },
+  { label: 'QR scans', value: '12.8K' },
+  { label: 'Loyalty members', value: '4,280' },
+  { label: 'Payment success', value: '98.6%' },
+  { label: 'Repeat guests', value: '41%' },
 ]
 
 const brandingOptions = [
@@ -96,6 +100,11 @@ export function HotelOwnerDashboard({ tenant }: { tenant: Tenant }) {
             brand-aware workspace.
           </p>
         </div>
+        <div className="qr-mini">
+          <span>Tenant QR</span>
+          <strong>{tenant.logoMark ?? 'QR'}</strong>
+          <small>/hotel/{tenant.slug}/menu</small>
+        </div>
       </div>
 
       <div className="metric-grid wide-grid">
@@ -110,8 +119,24 @@ export function HotelOwnerDashboard({ tenant }: { tenant: Tenant }) {
 
       <AssignManagerPanel tenant={tenant} />
 
+      <section className="section-card feature-grid">
+        {[
+          ['Hotel profile', 'Branches, contact details, approval status, domains, and public listing.'],
+          ['Branding customization', 'Logo, accent color, menu style, dark mode, typography, and tone.'],
+          ['Menu management', 'Items, modifiers, photos, allergens, availability, pricing, and AI tags.'],
+          ['Category management', 'Breakfast, lounge, room service, dietary collections, and seasonal menus.'],
+          ['Table and room management', 'QR assignment, capacity, service zones, rooms, floors, and housekeeping state.'],
+          ['Analytics dashboard', 'Orders, revenue, payments, feedback, discounts, and loyalty conversion.'],
+        ].map(([title, description]) => (
+          <article key={title} className="feature-tile">
+            <strong>{title}</strong>
+            <span>{description}</span>
+          </article>
+        ))}
+      </section>
+
       <section className="section-card grid-2">
-        <div className="section-card compact-card">
+        <div>
           <div className="section-heading">
             <span className="eyebrow">Brand management</span>
             <h2>Theme and identity</h2>
@@ -123,7 +148,7 @@ export function HotelOwnerDashboard({ tenant }: { tenant: Tenant }) {
           </div>
         </div>
 
-        <div className="section-card compact-card">
+        <div>
           <div className="section-heading">
             <span className="eyebrow">Operations</span>
             <h2>Core hotel modules</h2>
@@ -150,6 +175,34 @@ export function HotelOwnerDashboard({ tenant }: { tenant: Tenant }) {
               <small>{promo.status}</small>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="section-card grid-2">
+        <div>
+          <div className="section-heading">
+            <span className="eyebrow">Kitchen monitoring</span>
+            <h2>Service health</h2>
+          </div>
+          <div className="timeline">
+            {['Order accepted', 'Kitchen active', 'Runner assigned', 'Guest notified'].map((step, index) => (
+              <div key={step} className={index < 3 ? 'timeline-step is-complete' : 'timeline-step'}>
+                <span>{index + 1}</span>
+                <strong>{step}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="section-heading">
+            <span className="eyebrow">Discounts and loyalty</span>
+            <h2>Guest growth</h2>
+          </div>
+          <div className="feature-list">
+            <div className="list-item"><strong>Gold member dinner</strong><span>15% automatic discount</span><small>Live</small></div>
+            <div className="list-item"><strong>Birthday reward</strong><span>Free dessert with room order</span><small>Ready</small></div>
+            <div className="list-item"><strong>Feedback recovery</strong><span>AI-triggered apology credit</span><small>Draft</small></div>
+          </div>
         </div>
       </section>
     </div>
