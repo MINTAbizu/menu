@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express'
-import type { UserRole } from '@prisma/client'
 import { forbidden, unauthorized } from '../lib/http.js'
+import type { UserRole } from '../types/domain.js'
 
 export const requireRoles =
   (...roles: UserRole[]): RequestHandler =>

@@ -4,7 +4,8 @@ import { hotelRepository } from '../repositories/hotel-repository.js'
 
 export const tenantController = {
   resolve: asyncHandler(async (req, res) => {
-    const slug = req.params.slug ?? req.header('x-tenant-slug')
+    const requestedSlug = req.params.slug ?? req.header('x-tenant-slug')
+    const slug = Array.isArray(requestedSlug) ? requestedSlug[0] : requestedSlug
 
     if (!slug) {
       throw notFound('Tenant slug is required')

@@ -14,6 +14,7 @@ import { menuRoutes } from './routes/menu-routes.js'
 import { orderRoutes } from './routes/order-routes.js'
 import { serviceRequestRoutes } from './routes/service-request-routes.js'
 import { tenantRoutes } from './routes/tenant-routes.js'
+import { userRoutes } from './routes/user-routes.js'
 
 export const createApp = () => {
   const app = express()
@@ -39,6 +40,7 @@ export const createApp = () => {
   app.use('/api/v1/menu', menuRoutes)
   app.use('/api/v1/orders', orderRoutes)
   app.use('/api/v1/service-requests', serviceRequestRoutes)
+  app.use('/api/v1/users', userRoutes)
 
   app.use(errorHandler)
 

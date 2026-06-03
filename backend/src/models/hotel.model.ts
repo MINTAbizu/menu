@@ -19,7 +19,4 @@ const hotelSchema = new Schema(
   },
 )
 
-hotelSchema.index({ slug: 1 })
-hotelSchema.index({ subdomain: 1 })
-
 export const HotelModel = model('Hotel', hotelSchema)

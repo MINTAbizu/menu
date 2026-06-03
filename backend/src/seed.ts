@@ -40,6 +40,23 @@ const branch = await BranchModel.findOneAndUpdate(
   { upsert: true, new: true, setDefaultsOnInsert: true },
 )
 
+const superAdminEmail = process.env.SUPER_ADMIN_EMAIL ?? 'superadmin@platform.local'
+const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD ?? 'change-this-password'
+const superAdminHash = await bcrypt.hash(superAdminPassword, 12)
+
+await UserModel.findOneAndUpdate(
+  { email: superAdminEmail },
+  {
+    hotelId: hotel._id,
+    email: superAdminEmail,
+    fullName: 'Super Admin',
+    role: 'SUPER_ADMIN',
+    passwordHash: superAdminHash,
+    isActive: true,
+  },
+  { upsert: true, new: true, setDefaultsOnInsert: true },
+)
+
 await UserModel.findOneAndUpdate(
   { email: env.NODE_ENV === 'production' ? process.env.SUPER_ADMIN_EMAIL : 'owner@aster.local' },
   {
@@ -127,6 +144,57 @@ await MenuItemModel.findOneAndUpdate(
     tags: ['Upsell', 'Shareable'],
     isAvailable: true,
     prepMinutes: 14,
+  },
+  { upsert: true, new: true, setDefaultsOnInsert: true },
+)
+
+const secondHotel = await HotelModel.findOneAndUpdate(
+  { slug: 'marina-blue-resort' },
+  {
+    name: 'Marina Blue Resort',
+    slug: 'marina-blue-resort',
+    subdomain: 'marina',
+    primaryColor: '#2563eb',
+    secondaryColor: '#0f172a',
+    defaultLanguage: 'en',
+    subscriptionStatus: 'active',
+  },
+  { upsert: true, new: true, setDefaultsOnInsert: true },
+)
+
+await BranchModel.findOneAndUpdate(
+  { hotelId: secondHotel._id, name: 'Marina Resort Main' },
+  {
+    hotelId: secondHotel._id,
+    name: 'Marina Resort Main',
+    city: 'Mombasa',
+    timezone: 'Africa/Nairobi',
+  },
+  { upsert: true, new: true, setDefaultsOnInsert: true },
+)
+
+await UserModel.findOneAndUpdate(
+  { email: 'owner@marina.local' },
+  {
+    hotelId: secondHotel._id,
+    email: 'owner@marina.local',
+    fullName: 'Marina Hotel Owner',
+    role: 'HOTEL_OWNER',
+    passwordHash,
+    isActive: true,
+  },
+  { upsert: true, new: true, setDefaultsOnInsert: true },
+)
+
+await UserModel.findOneAndUpdate(
+  { email: 'kitchen@marina.local' },
+  {
+    hotelId: secondHotel._id,
+    email: 'kitchen@marina.local',
+    fullName: 'Marina Kitchen Lead',
+    role: 'KITCHEN_STAFF',
+    passwordHash,
+    isActive: true,
   },
   { upsert: true, new: true, setDefaultsOnInsert: true },
 )

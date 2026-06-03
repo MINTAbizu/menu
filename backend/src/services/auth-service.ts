@@ -17,12 +17,18 @@ export const authService = {
       throw unauthorized('Invalid email or password')
     }
 
-    const tokens = tokenService.issuePair(user)
+    const normalizedUser = {
+      id: String(user._id),
+      hotelId: user.hotelId ? String(user.hotelId) : null,
+      role: user.role,
+    }
+
+    const tokens = tokenService.issuePair(normalizedUser)
 
     return {
       user: {
-        id: String(user._id),
-        hotelId: user.hotelId ? String(user.hotelId) : null,
+        id: normalizedUser.id,
+        hotelId: normalizedUser.hotelId,
         email: user.email,
         fullName: user.fullName,
         role: user.role,

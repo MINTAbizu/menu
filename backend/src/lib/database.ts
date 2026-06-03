@@ -7,6 +7,9 @@ export const connectDatabase = async () => {
   await mongoose.connect(env.MONGODB_URI, {
     autoIndex: env.NODE_ENV !== 'production',
   })
+
+  const connection = mongoose.connection
+  console.log(`MongoDB connected: ${connection.name}`)
 }
 
 export const disconnectDatabase = async () => {
