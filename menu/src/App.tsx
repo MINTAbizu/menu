@@ -9,8 +9,10 @@ import { HotelOwnerDashboard } from './pages/HotelOwnerDashboard'
 import { KitchenDashboard } from './pages/KitchenDashboard'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { ReceptionistDashboard } from './pages/ReceptionistDashboard'
 import { SuperAdminDashboard } from './pages/SuperAdminDashboard'
 import { WaiterDashboard } from './pages/WaiterDashboard'
+import { GuestDashboard } from './pages/GuestDashboard'
 import type { Tenant, UserRole } from './types'
 
 const tenants: Tenant[] = [
@@ -20,6 +22,10 @@ const tenants: Tenant[] = [
     plan: 'Enterprise',
     accent: '#0f766e',
     surface: '#f4fbf8',
+    domain: 'aster-grand-addis.platform.com',
+    logoMark: 'AG',
+    branchCount: 4,
+    languages: ['English', 'Amharic', 'Arabic'],
   },
   {
     name: 'Marina Blue Resort',
@@ -27,6 +33,10 @@ const tenants: Tenant[] = [
     plan: 'Resort Plus',
     accent: '#2563eb',
     surface: '#f5f8ff',
+    domain: 'marina-blue-resort.platform.com',
+    logoMark: 'MB',
+    branchCount: 7,
+    languages: ['English', 'French', 'Spanish'],
   },
 ]
 
@@ -37,6 +47,8 @@ const routes = [
   { path: '/manager', label: 'Hotel Manager' },
   { path: '/waiter', label: 'Waiter' },
   { path: '/kitchen', label: 'Kitchen' },
+  { path: '/reception', label: 'Reception' },
+  { path: '/guest', label: 'Guest' },
   { path: '/guest-menu', label: 'Guest Menu' },
 ]
 
@@ -61,7 +73,15 @@ function RoleProtectedRoute({
 }
 
 function App() {
-  const [tenant, setTenant] = useState<Tenant>(tenants[0])
+  const initialTenant = useMemo(() => {
+    const pathSlug = window.location.pathname.match(/^\/hotel\/([^/]+)/)?.[1]
+    const hostSlug = window.location.hostname.split('.')[0]
+    return (
+      tenants.find((item) => item.slug === pathSlug || item.slug === hostSlug) ??
+      tenants[0]
+    )
+  }, [])
+  const [tenant, setTenant] = useState<Tenant>(initialTenant)
 
   const tenantStyle = useMemo(
     () => ({
@@ -76,9 +96,13 @@ function App() {
       <AuthProvider>
         <div className="app-shell" style={tenantStyle as CSSProperties}>
           <header className="topbar" aria-label="Application header">
-            <div>
-              <span className="eyebrow">Hospitality OS</span>
-              <strong>{tenant.name}</strong>
+            <div className="brand-lockup">
+              <span className="logo-mark">{tenant.logoMark}</span>
+              <div>
+                <span className="eyebrow">Hospitality OS</span>
+                <strong>{tenant.name}</strong>
+                <small>{tenant.domain ?? `${tenant.slug}.platform.com`}</small>
+              </div>
             </div>
             <div className="topbar-actions">
               <span className="subtitle">Tenant</span>
@@ -160,7 +184,25 @@ function App() {
                     </RoleProtectedRoute>
                   }
                 />
+                <Route
+                  path="/reception"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['RECEPTIONIST']}>
+                      <ReceptionistDashboard tenant={tenant} />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/guest"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['GUEST']}>
+                      <GuestDashboard tenant={tenant} />
+                    </RoleProtectedRoute>
+                  }
+                />
                 <Route path="/guest-menu" element={<GuestMenuPage tenant={tenant} />} />
+                <Route path="/hotel/:slug" element={<GuestMenuPage tenant={tenant} />} />
+                <Route path="/hotel/:slug/menu" element={<GuestMenuPage tenant={tenant} />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </main>
