@@ -1,15 +1,24 @@
 import type { Tenant } from '../types'
 
+const serviceMetrics = [
+  { label: 'Assigned tables', value: '12', detail: '4 need attention' },
+  { label: 'Average response', value: '2m 18s', detail: 'Target under 4 minutes' },
+  { label: 'Open orders', value: '21', detail: '7 ready for runner' },
+  { label: 'Tips today', value: '$386', detail: '+14% versus last shift' },
+]
+
 const activeTables = [
-  { table: 'T12', guests: 4, status: 'Preparing', total: '$62' },
-  { table: 'T04', guests: 2, status: 'Ready', total: '$32' },
-  { table: 'T21', guests: 6, status: 'Delivered', total: '$115' },
+  { table: 'T12', guests: 4, status: 'Preparing', total: '$62', note: 'Water requested' },
+  { table: 'T04', guests: 2, status: 'Ready', total: '$32', note: 'Runner assigned' },
+  { table: 'T21', guests: 6, status: 'Delivered', total: '$115', note: 'Dessert upsell' },
+  { table: 'Lounge 3', guests: 3, status: 'Payment', total: '$74', note: 'Split bill' },
 ]
 
 const waiterRequests = [
-  { label: 'Need water', table: 'T12', eta: '2 min' },
-  { label: 'Request bill', table: 'T04', eta: '5 min' },
-  { label: 'Room cleaning', table: 'Room 406', eta: '8 min' },
+  { label: 'Need water', table: 'T12', eta: '2 min', priority: 'High' },
+  { label: 'Request bill', table: 'T04', eta: '5 min', priority: 'Medium' },
+  { label: 'Room cleaning', table: 'Room 406', eta: '8 min', priority: 'Low' },
+  { label: 'Dietary question', table: 'T21', eta: 'Now', priority: 'High' },
 ]
 
 export function WaiterDashboard({ tenant }: { tenant: Tenant }) {
@@ -18,24 +27,41 @@ export function WaiterDashboard({ tenant }: { tenant: Tenant }) {
       <div className="page-header">
         <div>
           <p className="eyebrow">Waiter workspace</p>
-          <h1>{tenant.name} service dashboard</h1>
+          <h1>{tenant.name} floor service</h1>
           <p>
-            Keep table service smooth with live requests, active order tracking, and kitchen coordination.
+            See assigned tables, guest requests, runner handoffs, order status, payment actions,
+            and service recovery cues without leaving the dining floor.
           </p>
         </div>
+        <div className="qr-mini">
+          <span>Shift score</span>
+          <strong>94%</strong>
+          <small>Guest satisfaction live estimate</small>
+        </div>
+      </div>
+
+      <div className="metric-grid wide-grid">
+        {serviceMetrics.map((metric) => (
+          <article key={metric.label} className="metric-card">
+            <span>{metric.label}</span>
+            <strong>{metric.value}</strong>
+            <small>{metric.detail}</small>
+          </article>
+        ))}
       </div>
 
       <section className="section-card">
         <div className="section-heading">
           <span className="eyebrow">Floor overview</span>
-          <h2>Active tables</h2>
+          <h2>Active tables and room service</h2>
         </div>
         <div className="table-panel">
           <div className="table-header">
-            <span>Table</span>
+            <span>Location</span>
             <span>Guests</span>
             <span>Status</span>
             <span>Total</span>
+            <span>Next action</span>
           </div>
           {activeTables.map((table) => (
             <div key={table.table} className="table-row">
@@ -43,6 +69,7 @@ export function WaiterDashboard({ tenant }: { tenant: Tenant }) {
               <span>{table.guests}</span>
               <span>{table.status}</span>
               <span>{table.total}</span>
+              <span>{table.note}</span>
             </div>
           ))}
         </div>
@@ -51,14 +78,15 @@ export function WaiterDashboard({ tenant }: { tenant: Tenant }) {
       <section className="section-card">
         <div className="section-heading">
           <span className="eyebrow">Guest requests</span>
-          <h2>Immediate service</h2>
+          <h2>Prioritized service queue</h2>
         </div>
         <div className="request-grid">
           {waiterRequests.map((request) => (
-            <article key={request.label} className="request-card">
+            <article key={`${request.table}-${request.label}`} className="request-card">
               <span>{request.label}</span>
-              <small>{request.table}</small>
+              <small>{request.table} / {request.priority}</small>
               <strong>{request.eta}</strong>
+              <button type="button">Mark in progress</button>
             </article>
           ))}
         </div>

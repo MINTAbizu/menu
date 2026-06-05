@@ -23,6 +23,20 @@ const clearAuth = () => {
   localStorage.removeItem(storageKey)
 }
 
+async function readAuthError(res: Response) {
+  const body = await res.json().catch(() => null)
+  const issueMessage = Array.isArray(body?.issues)
+    ? body.issues
+        .map((issue: { path?: string[]; message?: string }) =>
+          [issue.path?.join('.'), issue.message].filter(Boolean).join(': '),
+        )
+        .filter(Boolean)
+        .join('; ')
+    : ''
+
+  return body?.message || issueMessage || body?.error || 'Login failed'
+}
+
 export const authClient = {
   async login(email: string, password: string) {
     const res = await fetch(`${apiBaseUrl}/api/v1/auth/login`, {
@@ -34,8 +48,7 @@ export const authClient = {
     })
 
     if (!res.ok) {
-      const body = await res.json().catch(() => null)
-      throw new Error(body?.message || 'Login failed')
+      throw new Error(await readAuthError(res))
     }
 
     return (await res.json()) as AuthSession

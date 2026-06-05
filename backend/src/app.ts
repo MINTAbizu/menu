@@ -10,6 +10,7 @@ import { apiRateLimit } from './middleware/rate-limit.js'
 import { tenantMiddleware } from './middleware/tenant.js'
 import { authRoutes } from './routes/auth-routes.js'
 import { healthRoutes } from './routes/health-routes.js'
+import { managerRoutes } from './routes/manager-routes.js'
 import { menuRoutes } from './routes/menu-routes.js'
 import { orderRoutes } from './routes/order-routes.js'
 import { serviceRequestRoutes } from './routes/service-request-routes.js'
@@ -37,6 +38,7 @@ export const createApp = () => {
   app.use('/health', healthRoutes)
   app.use('/api/v1/auth', authRoutes)
   app.use('/api/v1/tenants', tenantRoutes)
+  app.use('/api/v1/manager', managerRoutes)
   app.use('/api/v1/menu', menuRoutes)
   app.use('/api/v1/orders', orderRoutes)
   app.use('/api/v1/service-requests', serviceRequestRoutes)

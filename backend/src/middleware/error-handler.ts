@@ -5,8 +5,13 @@ import { env } from '../config/env.js'
 
 export const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
   if (error instanceof ZodError) {
+    const message = error.issues
+      .map((issue) => `${issue.path.join('.') || 'Request'}: ${issue.message}`)
+      .join('; ')
+
     res.status(422).json({
       error: 'Validation failed',
+      message,
       issues: error.issues,
     })
     return

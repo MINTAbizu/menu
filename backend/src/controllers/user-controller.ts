@@ -2,14 +2,17 @@ import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { asyncHandler } from '../middleware/async-handler.js'
 import { forbidden } from '../lib/http.js'
+import { passwordPolicyMessage, validateStrongPassword } from '../lib/password-policy.js'
+import { hotelRepository } from '../repositories/hotel-repository.js'
 import { userRepository } from '../repositories/user-repository.js'
 import type { UserRole } from '../types/domain.js'
 
 const createUserSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().refine(validateStrongPassword, passwordPolicyMessage),
   fullName: z.string().min(3),
   role: z.enum(['HOTEL_OWNER', 'HOTEL_MANAGER', 'WAITER', 'KITCHEN_STAFF', 'RECEPTIONIST']),
+  hotelSlug: z.string().min(1).optional(),
 })
 
 const listUsersSchema = z.object({
@@ -40,7 +43,24 @@ export const userController = {
       throw forbidden('You are not allowed to create users with this role')
     }
 
-    const hotelId = req.tenant?.hotelId ?? auth.hotelId
+    let hotelId = auth.hotelId
+
+    if (auth.role === 'SUPER_ADMIN') {
+      if (payload.hotelSlug) {
+        const hotel = await hotelRepository.findTenantIdentityBySlug(payload.hotelSlug)
+
+        if (!hotel) {
+          throw forbidden('Target hotel was not found')
+        }
+
+        hotelId = String(hotel._id)
+      } else {
+        hotelId = req.tenant?.hotelId ?? auth.hotelId
+      }
+    } else if (req.tenant?.hotelId && req.tenant.hotelId !== auth.hotelId) {
+      throw forbidden('You can only manage users for your assigned hotel')
+    }
+
     if (!hotelId) {
       throw forbidden('Hotel context is required to create this user')
     }
@@ -76,8 +96,12 @@ export const userController = {
       throw forbidden('Authentication required')
     }
 
-    const hotelId = req.tenant?.hotelId ?? auth.hotelId
+    const hotelId = auth.role === 'SUPER_ADMIN' ? req.tenant?.hotelId : auth.hotelId
     const filter: Record<string, string> = {}
+
+    if (auth.role !== 'SUPER_ADMIN' && req.tenant?.hotelId && req.tenant.hotelId !== auth.hotelId) {
+      throw forbidden('You can only view users for your assigned hotel')
+    }
 
     if (hotelId) {
       filter.hotelId = hotelId

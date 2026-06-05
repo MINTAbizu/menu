@@ -20,13 +20,16 @@ export const userRoleLabels: Record<UserRole, string> = {
 export type MenuItem = {
   _id: string
   name: string
-  category: string
+  category?: string
+  categoryId?: string
   price: number
-  rating: number
+  rating?: number
   tags: string[]
-  accent: string
+  accent?: string
   description?: string
   image?: string
+  imageUrl?: string
+  prepMinutes?: number
 }
 
 export type MenuCategory = {
@@ -45,6 +48,10 @@ export type Tenant = {
   logoMark?: string
   branchCount?: number
   languages?: string[]
+  subdomain?: string
+  logoUrl?: string
+  defaultLanguage?: string
+  subscriptionStatus?: string
 }
 
 export type AuthTokens = {
@@ -74,4 +81,27 @@ export type UserAccount = {
   role: UserRole
   hotelId: string | null
   assignedBy?: string | null
+}
+
+export type KitchenOrder = {
+  _id: string
+  status: string
+  total: number
+  createdAt?: string
+  tableId?: { label?: string } | null
+  roomId?: { number?: string } | null
+  items: Array<{
+    nameSnapshot: string
+    quantity: number
+    unitPrice: number
+    notes?: string
+  }>
+}
+
+export type ServiceRequest = {
+  _id: string
+  type: string
+  createdAt?: string
+  tableId?: { label?: string } | null
+  roomId?: { number?: string } | null
 }

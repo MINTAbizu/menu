@@ -3,6 +3,12 @@ import { asyncHandler } from '../middleware/async-handler.js'
 import { hotelRepository } from '../repositories/hotel-repository.js'
 
 export const tenantController = {
+  list: asyncHandler(async (_req, res) => {
+    const tenants = await hotelRepository.listPublicTenants()
+
+    res.status(200).json({ tenants })
+  }),
+
   resolve: asyncHandler(async (req, res) => {
     const requestedSlug = req.params.slug ?? req.header('x-tenant-slug')
     const slug = Array.isArray(requestedSlug) ? requestedSlug[0] : requestedSlug

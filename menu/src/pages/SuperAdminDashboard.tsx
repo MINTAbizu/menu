@@ -1,6 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { createUser } from '../api'
+import { PasswordStrength } from '../components/PasswordStrength'
+import { isStrongPassword } from '../passwordPolicy'
 import type { Tenant } from '../types'
+import type { AssignableRole } from '../types'
+import { userRoleLabels } from '../types'
 
 const metrics = [
   { label: 'Total hotels', value: '138' },
@@ -32,19 +36,28 @@ function AssignOwnerPanel({ tenant }: { tenant: Tenant }) {
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [role, setRole] = useState<AssignableRole>('HOTEL_OWNER')
+  const canSubmit = Boolean(email.trim() && fullName.trim().length >= 3 && isStrongPassword(password))
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setMessage(null)
     setError(null)
+
+    if (!canSubmit) {
+      setError('Complete all fields and use a strong password before creating the owner.')
+      return
+    }
+
     setIsSaving(true)
 
     try {
       const response = await createUser(tenant.slug, {
-        email,
-        fullName,
+        email: email.trim(),
+        fullName: fullName.trim(),
         password,
-        role: 'HOTEL_OWNER',
+        role,
+        hotelSlug: tenant.slug,
       })
       setMessage(`Owner ${response.user.fullName} created successfully.`)
       setEmail('')
@@ -61,9 +74,14 @@ function AssignOwnerPanel({ tenant }: { tenant: Tenant }) {
     <section className="section-card">
       <div className="section-heading">
         <span className="eyebrow">Assign hotel owner</span>
-        <h2>Create a new owner for this tenant</h2>
+        <h2>Create a new owner for {tenant.name}</h2>
       </div>
       <form onSubmit={handleSubmit} className="user-form">
+        <div className="assignment-context">
+          <strong>Target hotel</strong>
+          <span>{tenant.name}</span>
+          <small>Owner access will be scoped to <code>{tenant.slug}</code>.</small>
+        </div>
         <label>
           Full name
           <input value={fullName} onChange={(event) => setFullName(event.target.value)} required placeholder="Owner name" />
@@ -74,12 +92,19 @@ function AssignOwnerPanel({ tenant }: { tenant: Tenant }) {
         </label>
         <label>
           Password
-          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required placeholder="Create a secure password" />
+          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required placeholder="Create a strong password" autoComplete="new-password" />
+        </label>
+        <PasswordStrength password={password} />
+        <label>
+          Role
+          <select value={role} onChange={(event) => setRole(event.target.value as AssignableRole)}>
+            <option value="HOTEL_OWNER">{userRoleLabels.HOTEL_OWNER}</option>
+          </select>
         </label>
         {error ? <div className="alert">{error}</div> : null}
         {message ? <div className="status-message">{message}</div> : null}
-        <button className="primary-button" type="submit" disabled={isSaving}>
-          {isSaving ? 'Creating owner…' : 'Create owner'}
+        <button className="primary-button" type="submit" disabled={isSaving || !canSubmit}>
+          {isSaving ? 'Creating owner...' : 'Create owner'}
         </button>
       </form>
     </section>

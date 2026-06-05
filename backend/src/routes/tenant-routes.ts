@@ -3,4 +3,5 @@ import { tenantController } from '../controllers/tenant-controller.js'
 
 export const tenantRoutes = Router()
 
+tenantRoutes.get('/', tenantController.list)
 tenantRoutes.get('/resolve/:slug', tenantController.resolve)
